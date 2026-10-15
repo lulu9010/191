@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 user-scalable=no">
+
+  <title>MindAR WebAR 名片</title>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+
+  <style>
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+
+    /* =========================
+       滿版介紹畫面
+       ========================= */
+
+    #profilePage {
+
+      display: none;
+
+      position: fixed;
+
+      top: 0;
+      left: 0;
+
+      width: 100vw;
+      height: 100vh;
+
+      background: black;
+
+      z-index: 99999;
+
+    }
+
+
+    #profilePage img {
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+
+    }
+
+
+    /* =========================
+       回感應按鈕
+       ========================= */
+
+    #backButton {
+
+      position: absolute;
+
+      top: 20px;
+      right: 20px;
+
+      padding: 12px 20px;
+
+      background: rgba(0,0,0,0.75);
+
+      color: white;
+
+      border: 1px solid white;
+
+      border-radius: 8px;
+
+      font-size: 18px;
+
+      cursor: pointer;
+
+      z-index: 100000;
+
+    }
+
+
+    #arButton {
+      display: none;
+
+      position: fixed;
+
+      left: 25%;
+      top: 25%;
+
+      width: 50%;
+      height: 50%;
+
+      z-index: 1000;
+
+      cursor: pointer;
+  }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     HTML 滿版 Profile
+     ===================================== -->
+
+<div id="profilePage">
+
+  <img src="profile.png">
+
+  <button id="backButton">
+    回感應
+  </button>
+
+
+
+</div>
+<div id="arButton"></div>
+
+
+<!-- =====================================
+     AR Scene
+     ===================================== -->
+
+<a-scene
+
+  mindar-image="
+    imageTargetSrc: targets.mind;
+    autoStart: true;
+  "
+
+  embedded
+
+  color-space="sRGB"
+
+  renderer="
+    colorManagement: true;
+    physicallyCorrectLights: true;
+  "
+
+  vr-mode-ui="enabled: false"
+
+  device-orientation-permission-ui="enabled: false">
+
+
+  <!-- =========================
+       Assets
+       ========================= -->
+
+  <a-assets>
+
+    <img
+      id="profileTexture"
+      src="profile.png">
+
+  </a-assets>
+
+
+
+  <!-- =========================
+       Camera
+       ========================= -->
+
+  <a-camera
+
+    position="0 0 0"
+
+    look-controls="enabled: false"
+
+    cursor="
+      fuse: false;
+      rayOrigin: mouse;
+    "
+
+    raycaster="
+      objects: .clickable;
+    ">
+
+  </a-camera>
+
+
+
+  <!-- =========================
+       MindAR Target
+       ========================= -->
+
+  <a-entity
+
+    id="target"
+
+    mindar-image-target="
+      targetIndex: 0;
+    ">
+
+
+    <!-- AR Profile -->
+
+    <a-image
+
+      id="profileAR"
+
+      class="clickable"
+
+      src="#profileTexture"
+
+      position="0 0 0.01"
+
+      width="0.5625"
+
+      height="1">
+
+    </a-image>
+
+
+  </a-entity>
+
+
+</a-scene>
+
+
+
+<!-- =====================================
+     jQuery
+     ===================================== -->
+
+<script>
+
+$(document).ready(function () {
+
+
+  /* =====================================
+     Target Found
+     ===================================== */
+
+  $("#target").on("targetFound", function () {
+
+    console.log("Target Found");
+    $("#arButton").show();
+
+  });
+
+
+
+  /* =====================================
+     Target Lost
+     ===================================== */
+
+  $("#target").on("targetLost", function () {
+
+    console.log("Target Lost");
+    $("#arButton").hide();
+
+  });
+
+
+
+  /* =====================================
+     點擊 AR Profile
+     ===================================== */
+
+  $("#profileAR").on("click", function () {
+
+    console.log("Profile Click");
+
+    $("#profilePage").fadeIn(200);
+
+  });
+
+  $("#arButton").on("click", function () {
+
+    $("#profilePage").fadeIn();
+
+});
+
+
+
+  /* =====================================
+     回感應
+     ===================================== */
+
+  $("#backButton").on("click", function () {
+
+    console.log("Back to AR");
+
+    $("#profilePage").fadeOut(200);
+
+  });
+
+
+});
+
+</script>
+
+
+</body>
+
+</html>
